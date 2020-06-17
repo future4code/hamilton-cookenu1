@@ -11,13 +11,12 @@ export class UserDatabase extends ServerDataBase {
         email: string,
         role: string
     ): Promise<void> {
-
         await this.getConnection()
             .insert({
                 id,
                 name,
-                email,
                 password,
+                email,
                 role
             })
             .into(UserDatabase.TABLE_NAME);

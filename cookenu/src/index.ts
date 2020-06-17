@@ -1,9 +1,19 @@
 import express from "express";
+import "express-async-errors";
 import { AddressInfo } from "net";
+import errorCatcher from "./Middlewares/ErrorCatcher";
+import {
+  signUpEndingPoint
+} from "./Routes/signup.routes"
 
 const app = express();
 
 app.use(express.json());
+
+
+app.post("/signup", signUpEndingPoint)
+
+app.use(errorCatcher);
 
 const server = app.listen(process.env.PORT || 3000, () => {
   if (server) {
