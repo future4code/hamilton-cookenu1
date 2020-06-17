@@ -31,6 +31,9 @@ exports.signUpEndingPoint = (request, response) => __awaiter(void 0, void 0, voi
     if (!isPassword) {
         throw new CustomError_1.CustomError("Senha inválida, campeão!", 412);
     }
+    if (role !== "normal" && role !== "admin") {
+        throw new CustomError_1.CustomError("O usuário só pode ser do tipo normal ou admin!", 412);
+    }
     const newHash = yield new HashManager_1.HashManager().createHash(password);
     yield new UserDataBase_1.UserDatabase().createUser(newId, name, newHash, email, role);
     const newToken = new Authenticator_1.Authenticator().generateToken({

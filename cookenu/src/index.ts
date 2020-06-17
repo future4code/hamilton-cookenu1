@@ -5,13 +5,15 @@ import errorCatcher from "./Middlewares/ErrorCatcher";
 import {
   signUpEndingPoint
 } from "./Routes/signup.routes"
+import { login } from "./Routes/login.routes";
 
 const app = express();
 
 app.use(express.json());
 
-
 app.post("/signup", signUpEndingPoint)
+
+app.post("/login", login)
 
 app.use(errorCatcher);
 
