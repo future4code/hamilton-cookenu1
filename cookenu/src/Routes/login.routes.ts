@@ -4,6 +4,7 @@ import { CustomError } from "../Util/CustomError"
 import { validatePassword } from "../Util/validatePassword"
 import { UserDatabase } from "../data/UserDataBase"
 import { Authenticator } from "../services/Authenticator"
+import { HashManager } from "../services/HashManager"
 
 export const login = async (
     request : Request,
@@ -14,15 +15,27 @@ export const login = async (
 
     const isEmail = validateEmail(email)
     if(!isEmail){
-        throw new CustomError("Email inválido, parça", 412)
+        throw new CustomError("Email inválido.", 412)
     }
 
     const isPassword = validatePassword(password)
     if(!isPassword){
-        throw new CustomError("Senha inválida, campeão!", 412)
+        throw new CustomError("Formato de senha incorreto!", 412)
     }
 
     const user = await new UserDatabase().getUserByEmail(email)
+    if(!user){
+        throw new CustomError("Email ou senha incorreta!", 412)
+    }
+    
+    const hashCompare = await new HashManager().compare(
+        password,
+        user.password
+    )
+    if(!hashCompare){
+        throw new CustomError("Email ou senha incorreta!", 412)
+    }
+    
 
     if(user.role !== "normal" && user.role !== "admin"){
         throw new CustomError("O usuário só pode ser do tipo normal ou admin!", 412)
@@ -34,7 +47,7 @@ export const login = async (
     })
 
     response.status(200).send({
-        message: "Usuário logado com sucesso!",
+        message: `Usuário logado com sucesso!`,
         newToken
     })
 }

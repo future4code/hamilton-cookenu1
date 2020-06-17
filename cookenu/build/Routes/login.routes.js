@@ -18,17 +18,25 @@ const CustomError_1 = require("../Util/CustomError");
 const validatePassword_1 = require("../Util/validatePassword");
 const UserDataBase_1 = require("../data/UserDataBase");
 const Authenticator_1 = require("../services/Authenticator");
+const HashManager_1 = require("../services/HashManager");
 exports.login = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = request.body;
     const isEmail = emailValidate_1.default(email);
     if (!isEmail) {
-        throw new CustomError_1.CustomError("Email inválido, parça", 412);
+        throw new CustomError_1.CustomError("Email inválido.", 412);
     }
     const isPassword = validatePassword_1.validatePassword(password);
     if (!isPassword) {
-        throw new CustomError_1.CustomError("Senha inválida, campeão!", 412);
+        throw new CustomError_1.CustomError("Formato de senha incorreto!", 412);
     }
     const user = yield new UserDataBase_1.UserDatabase().getUserByEmail(email);
+    if (!user) {
+        throw new CustomError_1.CustomError("Email ou senha incorreta!", 412);
+    }
+    const hashCompare = yield new HashManager_1.HashManager().compare(password, user.password);
+    if (!hashCompare) {
+        throw new CustomError_1.CustomError("Email ou senha incorreta!", 412);
+    }
     if (user.role !== "normal" && user.role !== "admin") {
         throw new CustomError_1.CustomError("O usuário só pode ser do tipo normal ou admin!", 412);
     }
@@ -37,7 +45,7 @@ exports.login = (request, response) => __awaiter(void 0, void 0, void 0, functio
         role: user.role
     });
     response.status(200).send({
-        message: "Usuário logado com sucesso!",
+        message: `Usuário ${user.name} do tipo ${user.role} logado com sucesso!`,
         newToken
     });
 });
