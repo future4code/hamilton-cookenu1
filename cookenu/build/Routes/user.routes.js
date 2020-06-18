@@ -15,8 +15,11 @@ const UserDataBase_1 = require("../data/UserDataBase");
 const ServerDataBase_1 = require("../data/ServerDataBase");
 exports.getProfileEndingPoint = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const token = request.headers.authorization;
+    console.log('token', token);
     const userInfo = yield new Authenticator_1.Authenticator().getData(token);
+    console.log('userinfo', token);
     const userProfile = yield new UserDataBase_1.UserDatabase().getUserById(userInfo.id);
+    console.log('userpfoiel', token);
     response
         .status(200)
         .send({
