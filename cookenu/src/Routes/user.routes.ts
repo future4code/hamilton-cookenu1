@@ -10,12 +10,10 @@ export const getProfileEndingPoint = async (
 ) => {
 
     const token = request.headers.authorization as string
-    console.log('token',token)
+
     const userInfo = await new Authenticator().getData( token )
-    console.log('userinfo',token)
 
     const userProfile = await new UserDatabase().getUserById( userInfo.id )
-    console.log('userpfoiel',token)
 
     response
         .status(200)

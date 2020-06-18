@@ -9,19 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProfileEndingPoint = void 0;
+exports.createRecipeEndingPoint = void 0;
+const RecipeDataBase_1 = require("../data/RecipeDataBase");
 const Authenticator_1 = require("../services/Authenticator");
-const UserDataBase_1 = require("../data/UserDataBase");
-const ServerDataBase_1 = require("../data/ServerDataBase");
-exports.getProfileEndingPoint = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+const IdGenetor_1 = require("../services/IdGenetor");
+exports.createRecipeEndingPoint = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = new IdGenetor_1.IdGenerator().generate();
+    const { title, description } = request.body;
     const token = request.headers.authorization;
     const userInfo = yield new Authenticator_1.Authenticator().getData(token);
-    const userProfile = yield new UserDataBase_1.UserDatabase().getUserById(userInfo.id);
-    response
-        .status(200)
-        .send({
-        id: userProfile.id,
-        email: userProfile.email
+    yield new RecipeDataBase_1.RecipeDataBase().createRecipe(id, title, description, new Date, userInfo.id);
+    response.status(200).send({
+        message: `Receita criada com sucesso!`,
     });
-    yield ServerDataBase_1.ServerDataBase.destroyConnection();
 });
