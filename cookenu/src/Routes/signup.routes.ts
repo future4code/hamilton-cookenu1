@@ -6,6 +6,7 @@ import validateEmail from "../Util/emailValidate"
 import { CustomError } from "../Util/CustomError"
 import { validatePassword } from "../Util/validatePassword"
 import { Authenticator } from "../services/Authenticator"
+import { RefreshTokenDataBase } from "../data/RefreshTokenDataBase"
 
 
 export const signUpEndingPoint = async (
@@ -14,7 +15,7 @@ export const signUpEndingPoint = async (
 ) => {
 
     const newId = new IdGenerator().generate()
-    const { name, email, password, role } = request.body
+    const { name, email, password, role, device } = request.body
 
     const isEmail = validateEmail(email)
     if(!isEmail){
@@ -37,18 +38,36 @@ export const signUpEndingPoint = async (
         name,
         newHash,
         email,
-        role
+        role,
+        device
     )
 
-    const newToken = new Authenticator().generateToken({
-        id: newId, 
+    const newAccessToken = await new Authenticator().generateToken({
+        id: newId,
         role: role
-    })
+    },
+    "1d"
+    )
+
+    const newRefreshToken = await new Authenticator().generateToken({
+        id: newId,
+        device: device,
+    },
+    process.env.ACCESS_TOKEN_EXPIRES_IN
+    )
+
+    await new RefreshTokenDataBase().storeRefreshToken(
+        newRefreshToken,
+        device,
+        true,
+        newId
+    )
 
     response
         .status(200)
         .send({ 
             message: "Usuário criado com sucesso!",
-            newToken
+            newAccessToken,
+            newRefreshToken
         })
 }
