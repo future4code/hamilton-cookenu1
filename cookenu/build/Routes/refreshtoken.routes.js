@@ -9,19 +9,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProfileEndingPoint = void 0;
 const Authenticator_1 = require("../services/Authenticator");
+const CustomError_1 = require("../Util/CustomError");
 const UserDataBase_1 = require("../data/UserDataBase");
 const ServerDataBase_1 = require("../data/ServerDataBase");
-exports.getProfileEndingPoint = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = request.headers.authorization;
-    const userInfo = yield new Authenticator_1.Authenticator().getData(token);
-    const userProfile = yield new UserDataBase_1.UserDatabase().getUserById(userInfo.id);
-    response
-        .status(200)
-        .send({
-        id: userProfile.id,
-        email: userProfile.email
+const renewRefreshToken = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    const { refreshToken, device } = request.body;
+    const authenticator = new Authenticator_1.Authenticator();
+    const userData = yield authenticator.getData(refreshToken);
+    if (userData.device !== device) {
+        throw new CustomError_1.CustomError("Logue novamente!", 412);
+    }
+    const user = yield new UserDataBase_1.UserDatabase().getUserById(userData.id);
+    const newAccessToken = yield authenticator.generateToken({
+        id: user.id,
+        role: user.role
+    });
+    response.status(200).send({
+        "acces token": newAccessToken
     });
     yield ServerDataBase_1.ServerDataBase.destroyConnection();
 });

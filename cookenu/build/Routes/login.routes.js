@@ -12,15 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = void 0;
+exports.loginEndingPoint = void 0;
 const emailValidate_1 = __importDefault(require("../Util/emailValidate"));
 const CustomError_1 = require("../Util/CustomError");
 const validatePassword_1 = require("../Util/validatePassword");
 const UserDataBase_1 = require("../data/UserDataBase");
 const Authenticator_1 = require("../services/Authenticator");
 const HashManager_1 = require("../services/HashManager");
-exports.login = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password } = request.body;
+const RefreshTokenDataBase_1 = require("../data/RefreshTokenDataBase");
+exports.loginEndingPoint = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, password, device } = request.body;
     const isEmail = emailValidate_1.default(email);
     if (!isEmail) {
         throw new CustomError_1.CustomError("Email inválido.", 412);
@@ -40,12 +41,24 @@ exports.login = (request, response) => __awaiter(void 0, void 0, void 0, functio
     if (user.role !== "normal" && user.role !== "admin") {
         throw new CustomError_1.CustomError("O usuário só pode ser do tipo normal ou admin!", 412);
     }
-    const newToken = yield new Authenticator_1.Authenticator().generateToken({
+    const authenticator = new Authenticator_1.Authenticator();
+    const accessToken = yield authenticator.generateToken({
         id: user.id,
         role: user.role
-    });
+    }, "1d");
+    const refreshToken = yield authenticator.generateToken({
+        id: user.id,
+        device: user.device
+    }, "1d");
+    const refreshTokenDataBase = new RefreshTokenDataBase_1.RefreshTokenDataBase();
+    yield refreshTokenDataBase.storeRefreshToken(refreshToken, user.device, true, user.id);
+    const retrievedRefreshToken = yield refreshTokenDataBase.getRefreshTokenByIdAndDevice(user.id, user.device);
+    if (retrievedRefreshToken) {
+        yield refreshTokenDataBase.deleteRefreshToken(retrievedRefreshToken.token);
+    }
     response.status(200).send({
-        message: `Usuário ${user.name} do tipo ${user.role} logado com sucesso!`,
-        newToken
+        message: `Usuário logado com sucesso!`,
+        "access token": accessToken,
+        "refresh token": refreshToken
     });
 });

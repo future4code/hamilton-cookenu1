@@ -28,6 +28,7 @@ export class RefreshTokenDataBase extends ServerDataBase{
         const tokenInfo = await this
             .getConnection()
             .select('*')
+            .from(RefreshTokenDataBase.TABLE_NAME)
             .where({
                 refresh_token: token
             })
@@ -49,13 +50,14 @@ export class RefreshTokenDataBase extends ServerDataBase{
         const tokenInfo = await this
             .getConnection()
             .select('*')
+            .from(RefreshTokenDataBase.TABLE_NAME)
             .where({
                 user_id: id,
                 device: device
             })
-        
-        const retrievedToken = tokenInfo[0][0]
 
+        const retrievedToken = tokenInfo[0]
+        
         return{
             token: retrievedToken.refresh_token,
             device: retrievedToken.device,
@@ -68,6 +70,7 @@ export class RefreshTokenDataBase extends ServerDataBase{
         await this
             .getConnection()
             .del()
+            .from(RefreshTokenDataBase.TABLE_NAME)
             .where({ refresh_token: token })
     }
 }

@@ -7,7 +7,7 @@ import { Authenticator } from "../services/Authenticator"
 import { HashManager } from "../services/HashManager"
 import { RefreshTokenDataBase } from "../data/RefreshTokenDataBase"
 
-export const login = async (
+export const loginEndingPoint = async (
     request : Request,
     response : Response
 ) => {
@@ -46,11 +46,13 @@ export const login = async (
     const accessToken = await authenticator.generateToken({
         id: user.id, 
         role: user.role
-    })
+    }, "1d"
+    )
     const refreshToken = await authenticator.generateToken({
         id: user.id,
         device: user.device
-    })
+    }, "1d"
+    )
 
     const refreshTokenDataBase = new RefreshTokenDataBase()
     await refreshTokenDataBase.storeRefreshToken(

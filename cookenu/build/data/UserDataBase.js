@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserDatabase = void 0;
 const ServerDataBase_1 = require("./ServerDataBase");
 class UserDatabase extends ServerDataBase_1.ServerDataBase {
-    createUser(id, name, password, email, role) {
+    createUser(id, name, password, email, role, device) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.getConnection()
                 .insert({
@@ -20,7 +20,8 @@ class UserDatabase extends ServerDataBase_1.ServerDataBase {
                 name,
                 password,
                 email,
-                role
+                role,
+                device
             })
                 .into(UserDatabase.TABLE_NAME);
         });

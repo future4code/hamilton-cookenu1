@@ -5,7 +5,8 @@ import errorCatcher from "./Middlewares/ErrorCatcher";
 import {
   signUpEndingPoint
 } from "./Routes/signup.routes"
-import { login } from "./Routes/login.routes";
+import { loginEndingPoint } from "./Routes/login.routes";
+import { getProfileEndingPoint } from "./Routes/user.routes"
 
 const app = express();
 
@@ -13,7 +14,9 @@ app.use(express.json());
 
 app.post("/signup", signUpEndingPoint)
 
-app.post("/login", login)
+app.post("/login", loginEndingPoint)
+
+app.get("/user/profile", getProfileEndingPoint)
 
 app.use(errorCatcher);
 

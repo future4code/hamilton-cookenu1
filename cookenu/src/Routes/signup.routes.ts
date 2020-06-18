@@ -7,6 +7,7 @@ import { CustomError } from "../Util/CustomError"
 import { validatePassword } from "../Util/validatePassword"
 import { Authenticator } from "../services/Authenticator"
 import { RefreshTokenDataBase } from "../data/RefreshTokenDataBase"
+import { ServerDataBase } from "../data/ServerDataBase"
 
 
 export const signUpEndingPoint = async (
@@ -70,4 +71,6 @@ export const signUpEndingPoint = async (
             newAccessToken,
             newRefreshToken
         })
+    
+    await ServerDataBase.destroyConnection()
 }

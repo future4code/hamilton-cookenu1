@@ -2,6 +2,7 @@ import { Request, Response} from "express"
 import { Authenticator } from "../services/Authenticator"
 import { CustomError } from "../Util/CustomError"
 import { UserDatabase } from "../data/UserDataBase"
+import { ServerDataBase } from "../data/ServerDataBase"
 
 
 const renewRefreshToken = async (
@@ -30,4 +31,6 @@ const renewRefreshToken = async (
     response.status(200).send({
         "acces token": newAccessToken
     })
+
+    await ServerDataBase.destroyConnection()
 }

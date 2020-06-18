@@ -8,10 +8,12 @@ require("express-async-errors");
 const ErrorCatcher_1 = __importDefault(require("./Middlewares/ErrorCatcher"));
 const signup_routes_1 = require("./Routes/signup.routes");
 const login_routes_1 = require("./Routes/login.routes");
+const user_routes_1 = require("./Routes/user.routes");
 const app = express_1.default();
 app.use(express_1.default.json());
 app.post("/signup", signup_routes_1.signUpEndingPoint);
-app.post("/login", login_routes_1.login);
+app.post("/login", login_routes_1.loginEndingPoint);
+app.get("/user/profile", user_routes_1.getProfileEndingPoint);
 app.use(ErrorCatcher_1.default);
 const server = app.listen(process.env.PORT || 3000, () => {
     if (server) {
