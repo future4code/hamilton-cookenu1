@@ -16,6 +16,7 @@ app.post("/signup", signup_routes_1.signUpEndingPoint);
 app.post("/login", login_routes_1.loginEndingPoint);
 app.get("/user/profile", user_routes_1.getProfileEndingPoint);
 app.post("/recipe", recipe_routes_1.createRecipeEndingPoint);
+app.get("/recipe/:id", recipe_routes_1.getRecipeEndingPoint);
 app.use(ErrorCatcher_1.default);
 const server = app.listen(process.env.PORT || 3000, () => {
     if (server) {

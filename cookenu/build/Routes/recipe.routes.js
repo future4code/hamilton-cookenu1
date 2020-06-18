@@ -9,10 +9,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createRecipeEndingPoint = void 0;
+exports.getRecipeEndingPoint = exports.createRecipeEndingPoint = void 0;
 const RecipeDataBase_1 = require("../data/RecipeDataBase");
 const Authenticator_1 = require("../services/Authenticator");
 const IdGenetor_1 = require("../services/IdGenetor");
+const CustomError_1 = require("../Util/CustomError");
 exports.createRecipeEndingPoint = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const id = new IdGenetor_1.IdGenerator().generate();
     const { title, description } = request.body;
@@ -22,4 +23,15 @@ exports.createRecipeEndingPoint = (request, response) => __awaiter(void 0, void 
     response.status(200).send({
         message: `Receita criada com sucesso!`,
     });
+});
+exports.getRecipeEndingPoint = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = request.params.id;
+    const token = request.headers.authorization;
+    const userInfo = yield new Authenticator_1.Authenticator().getData(token);
+    const recipe = yield new RecipeDataBase_1.RecipeDataBase().getRecipeById(id);
+    console.log(userInfo.id, recipe.user_id);
+    if (userInfo.id !== recipe.user_id) {
+        throw new CustomError_1.CustomError("Problemas na autenticação!", 401);
+    }
+    response.status(200).send(recipe);
 });

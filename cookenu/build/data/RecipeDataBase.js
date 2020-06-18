@@ -25,30 +25,13 @@ class RecipeDataBase extends ServerDataBase_1.ServerDataBase {
                 .into(RecipeDataBase.TABLE_NAME);
         });
     }
-    getUserBycreated_at(created_at) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.getConnection()
-                .select("*")
-                .from(RecipeDataBase.TABLE_NAME)
-                .where({ created_at });
-            return result[0];
-        });
-    }
-    getUserById(id) {
+    getRecipeById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield this.getConnection()
                 .select("*")
                 .from(RecipeDataBase.TABLE_NAME)
                 .where({ id });
             return result[0];
-        });
-    }
-    deleteUser(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.getConnection()
-                .where({ id: id })
-                .del()
-                .from(RecipeDataBase.TABLE_NAME);
         });
     }
 }
