@@ -29,9 +29,24 @@ export class RecipeDataBase extends ServerDataBase {
   }
 
   public async getRecipesByUserId(user_id: string) {
-    return await this.getConnection()
+    const recipe = await this.getConnection()
       .select("*")
       .from(RecipeDataBase.TABLE_NAME)
       .where({ user_id });
+    return recipe[0]
+  }
+
+  public async editRecipe (
+    recipe_id : string,
+    recipe_title : string,
+    recipe_description : string
+    ){
+    await this.getConnection()
+      .from(RecipeDataBase.TABLE_NAME)
+      .where({id: recipe_id})
+      .update({
+        title: recipe_title,
+        description: recipe_description
+      })
   }
 }
