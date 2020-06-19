@@ -101,6 +101,7 @@ const getFeeedEndpoint = async (request: Request, response: Response) => {
     ]);
 
     userRecipes.forEach((recipe: Object) =>
+
       recipes.push({ ...recipe, userName: user.name })
     );
   }

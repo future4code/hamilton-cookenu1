@@ -3,6 +3,7 @@ import { RecipeDataBase } from "../data/RecipeDataBase";
 import { Authenticator } from "../services/Authenticator";
 import { IdGenerator } from "../services/IdGenetor";
 import { CustomError } from "../Util/CustomError";
+import { ServerDataBase } from "../data/ServerDataBase";
 
 const createRecipeEndingPoint = async (
   request: Request,
@@ -26,6 +27,8 @@ const createRecipeEndingPoint = async (
   response.status(200).send({
     message: `Receita criada com sucesso!`,
   });
+
+  await ServerDataBase.destroyConnection();
 };
 
 const getRecipeEndingPoint = async (request: Request, response: Response) => {
@@ -41,38 +44,61 @@ const getRecipeEndingPoint = async (request: Request, response: Response) => {
   }
 
   response.status(200).send(recipe);
+
+  await ServerDataBase.destroyConnection();
 };
 
-const editRecipeEndingPoint = async (
-    request : Request,
-    response : Response
+const editRecipeEndingPoint = async (request: Request, response: Response) => {
+  const token = request.headers.authorization as string;
+  const { recipeId, recipeTitle, recipeDescription } = request.body;
+
+  const user = await new Authenticator().getData(token);
+  const recipeCheck = await new RecipeDataBase().getRecipesByUserId(user.id);
+  if (recipeCheck.user_id !== user.id) {
+    throw new CustomError(
+      "Esta receita não pode ser modificada por esse usuário",
+      400
+    );
+  }
+
+  await new RecipeDataBase().editRecipe(
+    recipeId,
+    recipeTitle,
+    recipeDescription
+  );
+
+  response.status(200).send({ message: "Receita atualizada com sucesso!" });
+
+  await ServerDataBase.destroyConnection();
+};
+
+const deleteRecipeEndingPoint = async (
+  request: Request,
+  response: Response
 ) => {
+  const token = request.headers.authorization as string;
+  const recipeId = request.body.recipeId;
 
-    const token = request.headers.authorization as string
-    const { recipeId, recipeTitle, recipeDescription } = request.body
+  const user = await new Authenticator().getData(token);
+  const recipeCheck = await new RecipeDataBase().getRecipesByUserId(user.id);
+  if (recipeCheck.user_id !== user.id) {
+    throw new CustomError(
+      "Esta receita não pode ser deletada por esse usuário",
+      400
+    );
+  }
+  await new RecipeDataBase().deleteRecipe(recipeId);
 
-    const user = await new Authenticator().getData( token )
-    const recipeCheck = await new RecipeDataBase().getRecipesByUserId( user.id )
-    if(recipeCheck.user_id !== user.id){
-        throw new CustomError(
-            "Esta receita não pode ser modificada por esse usuário",
-            400
-            )
-    }
+  response.status(200).send({ message: "Receita deletada!" });
 
-    await new RecipeDataBase().editRecipe(
-        recipeId,
-        recipeTitle,
-        recipeDescription
-    )
-
-    response.status(200).send({ message: "Receita atualizada com sucesso!"})
-}
+  await ServerDataBase.destroyConnection();
+};
 
 const recipeRoute = Router();
 
 recipeRoute.post("/", createRecipeEndingPoint);
 recipeRoute.put("/edit", editRecipeEndingPoint);
+recipeRoute.delete("/delete", deleteRecipeEndingPoint);
 recipeRoute.get("/:id", getRecipeEndingPoint);
 
 export default recipeRoute;
