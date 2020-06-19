@@ -43,9 +43,36 @@ const getRecipeEndingPoint = async (request: Request, response: Response) => {
   response.status(200).send(recipe);
 };
 
+const editRecipeEndingPoint = async (
+    request : Request,
+    response : Response
+) => {
+
+    const token = request.headers.authorization as string
+    const { recipeId, recipeTitle, recipeDescription } = request.body
+
+    const user = await new Authenticator().getData( token )
+    const recipeCheck = await new RecipeDataBase().getRecipesByUserId( user.id )
+    if(recipeCheck.user_id !== user.id){
+        throw new CustomError(
+            "Esta receita não pode ser modificada por esse usuário",
+            400
+            )
+    }
+
+    await new RecipeDataBase().editRecipe(
+        recipeId,
+        recipeTitle,
+        recipeDescription
+    )
+
+    response.status(200).send({ message: "Receita atualizada com sucesso!"})
+}
+
 const recipeRoute = Router();
 
 recipeRoute.post("/", createRecipeEndingPoint);
+recipeRoute.put("/edit", editRecipeEndingPoint);
 recipeRoute.get("/:id", getRecipeEndingPoint);
 
 export default recipeRoute;
