@@ -38,21 +38,19 @@ exports.signUpEndingPoint = (request, response) => __awaiter(void 0, void 0, voi
     }
     const newHash = yield new HashManager_1.HashManager().createHash(password);
     yield new UserDataBase_1.UserDatabase().createUser(newId, name, newHash, email, role, device);
-    const newAccessToken = yield new Authenticator_1.Authenticator().generateToken({
+    const newAccessToken = new Authenticator_1.Authenticator().generateToken({
         id: newId,
-        role: role
+        role: role,
     }, "1d");
-    const newRefreshToken = yield new Authenticator_1.Authenticator().generateToken({
+    const newRefreshToken = new Authenticator_1.Authenticator().generateToken({
         id: newId,
         device: device,
     }, process.env.ACCESS_TOKEN_EXPIRES_IN);
     yield new RefreshTokenDataBase_1.RefreshTokenDataBase().storeRefreshToken(newRefreshToken, device, true, newId);
-    response
-        .status(200)
-        .send({
+    response.status(200).send({
         message: "Usuário criado com sucesso!",
         newAccessToken,
-        newRefreshToken
+        newRefreshToken,
     });
     yield ServerDataBase_1.ServerDataBase.destroyConnection();
 });

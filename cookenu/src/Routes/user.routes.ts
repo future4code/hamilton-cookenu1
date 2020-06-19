@@ -1,17 +1,16 @@
-import { Request, Response, request } from "express";
+import { Request, Response, Router } from "express";
 import { FollowDatabase } from "../data/FollowDatabase";
+import { RecipeDataBase } from "../data/RecipeDataBase";
 import { ServerDataBase } from "../data/ServerDataBase";
 import { UserDatabase } from "../data/UserDataBase";
 import { Authenticator } from "../services/Authenticator";
 import { CustomError } from "../Util/CustomError";
+import moment from "moment";
 
-export const getProfileEndingPoint = async (
-  request: Request,
-  response: Response
-) => {
+const getProfileEndingPoint = async (request: Request, response: Response) => {
   const token = request.headers.authorization as string;
 
-  const userInfo = await new Authenticator().getData(token);
+  const userInfo = new Authenticator().getData(token);
 
   const userProfile = await new UserDatabase().getUserById(userInfo.id);
 
@@ -23,7 +22,7 @@ export const getProfileEndingPoint = async (
   await ServerDataBase.destroyConnection();
 };
 
-export const getOtherUserProfile = async (
+const getOtherUserProfileEndpoint = async (
   request: Request,
   response: Response
 ) => {
@@ -41,7 +40,7 @@ export const getOtherUserProfile = async (
   await ServerDataBase.destroyConnection();
 };
 
-export const followUser = async (request: Request, response: Response) => {
+const followUserEndpoint = async (request: Request, response: Response) => {
   const { userToFollowId } = request.body;
   const token = request.headers.authorization as string;
 
@@ -62,7 +61,7 @@ export const followUser = async (request: Request, response: Response) => {
   await ServerDataBase.destroyConnection();
 };
 
-export const unfollowUser = async (request: Request, response: Response) => {
+const unfollowUserEndpoint = async (request: Request, response: Response) => {
   const { userToUnfollowId } = request.body;
   const token = request.headers.authorization as string;
 
@@ -82,3 +81,44 @@ export const unfollowUser = async (request: Request, response: Response) => {
 
   await ServerDataBase.destroyConnection();
 };
+
+const getFeeedEndpoint = async (request: Request, response: Response) => {
+  const token = request.headers.authorization as string;
+  const userInfo = new Authenticator().getData(token);
+
+  const followingUsers = await new FollowDatabase().getFollowing(userInfo.id);
+
+  const recipeDatabase = new RecipeDataBase();
+  const userDatabase = new UserDatabase();
+
+  const recipes: any[] = [];
+
+  for (let i = 0; i < followingUsers.length; i++) {
+    const [user, userRecipes] = await Promise.all([
+      userDatabase.getUserById(followingUsers[i].id_following),
+      recipeDatabase.getRecipesByUserId(followingUsers[i].id_following),
+    ]);
+
+    userRecipes.forEach((recipe) =>
+      recipes.push({ ...recipe, userName: user.name })
+    );
+  }
+
+  recipes.sort((b, a) => {
+    const aDate = new Date(a.created_at);
+    const bDate = new Date(b.created_at);
+    return aDate.getTime() - bDate.getTime();
+  });
+
+  response.status(200).send(recipes);
+};
+
+const userRoute = Router();
+
+userRoute.get("/profile", getProfileEndingPoint);
+userRoute.get("/feed", getFeeedEndpoint);
+userRoute.get("/:id", getOtherUserProfileEndpoint);
+userRoute.post("/follow", followUserEndpoint);
+userRoute.post("/unfollow", unfollowUserEndpoint);
+
+export default userRoute;

@@ -9,37 +9,32 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RecipeDataBase = void 0;
+exports.FollowDatabase = void 0;
 const ServerDataBase_1 = require("./ServerDataBase");
-class RecipeDataBase extends ServerDataBase_1.ServerDataBase {
-    createRecipe(id, title, description, created_at, user_id) {
+class FollowDatabase extends ServerDataBase_1.ServerDataBase {
+    followUser(id_following, id_follower) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.getConnection().into(RecipeDataBase.TABLE_NAME).insert({
-                id,
-                title,
-                description,
-                created_at,
-                user_id,
-            });
+            yield this.getConnection()
+                .insert({ id_follower, id_following })
+                .into(FollowDatabase.TABLE_NAME);
         });
     }
-    getRecipeById(id) {
+    unfollowUser(id_following, id_follower) {
         return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.getConnection()
-                .select("*")
-                .from(RecipeDataBase.TABLE_NAME)
-                .where({ id });
-            return result[0];
+            yield this.getConnection()
+                .delete()
+                .where({ id_follower, id_following })
+                .into(FollowDatabase.TABLE_NAME);
         });
     }
-    getRecipesByUserId(user_id) {
+    getFollowing(id_follower) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.getConnection()
                 .select("*")
-                .from(RecipeDataBase.TABLE_NAME)
-                .where({ user_id });
+                .where({ id_follower })
+                .into(FollowDatabase.TABLE_NAME);
         });
     }
 }
-exports.RecipeDataBase = RecipeDataBase;
-RecipeDataBase.TABLE_NAME = "recipes_cookenu";
+exports.FollowDatabase = FollowDatabase;
+FollowDatabase.TABLE_NAME = "followers_cookenu";

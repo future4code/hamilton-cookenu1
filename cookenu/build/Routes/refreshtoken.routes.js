@@ -9,11 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.renewRefreshToken = void 0;
 const Authenticator_1 = require("../services/Authenticator");
 const CustomError_1 = require("../Util/CustomError");
 const UserDataBase_1 = require("../data/UserDataBase");
 const ServerDataBase_1 = require("../data/ServerDataBase");
-const renewRefreshToken = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+exports.renewRefreshToken = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const { refreshToken, device } = request.body;
     const authenticator = new Authenticator_1.Authenticator();
     const userData = yield authenticator.getData(refreshToken);

@@ -13,15 +13,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.loginEndingPoint = void 0;
-const emailValidate_1 = __importDefault(require("../Util/emailValidate"));
-const CustomError_1 = require("../Util/CustomError");
-const validatePassword_1 = require("../Util/validatePassword");
+const RefreshTokenDataBase_1 = require("../data/RefreshTokenDataBase");
 const UserDataBase_1 = require("../data/UserDataBase");
 const Authenticator_1 = require("../services/Authenticator");
 const HashManager_1 = require("../services/HashManager");
-const RefreshTokenDataBase_1 = require("../data/RefreshTokenDataBase");
+const CustomError_1 = require("../Util/CustomError");
+const emailValidate_1 = __importDefault(require("../Util/emailValidate"));
+const validatePassword_1 = require("../Util/validatePassword");
 exports.loginEndingPoint = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password, device } = request.body;
+    const { email, password } = request.body;
     const isEmail = emailValidate_1.default(email);
     if (!isEmail) {
         throw new CustomError_1.CustomError("Email inválido.", 412);
@@ -44,11 +44,11 @@ exports.loginEndingPoint = (request, response) => __awaiter(void 0, void 0, void
     const authenticator = new Authenticator_1.Authenticator();
     const accessToken = yield authenticator.generateToken({
         id: user.id,
-        role: user.role
+        role: user.role,
     }, "1d");
     const refreshToken = yield authenticator.generateToken({
         id: user.id,
-        device: user.device
+        device: user.device,
     }, "1d");
     const refreshTokenDataBase = new RefreshTokenDataBase_1.RefreshTokenDataBase();
     yield refreshTokenDataBase.storeRefreshToken(refreshToken, user.device, true, user.id);
@@ -59,6 +59,6 @@ exports.loginEndingPoint = (request, response) => __awaiter(void 0, void 0, void
     response.status(200).send({
         message: `Usuário logado com sucesso!`,
         "access token": accessToken,
-        "refresh token": refreshToken
+        "refresh token": refreshToken,
     });
 });

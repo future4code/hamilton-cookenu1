@@ -25,7 +25,7 @@ class Authenticator {
     generateToken(input, expiresIn = process.env.ACCESS_TOKEN_EXPIRES_IN) {
         const token = jwt.sign({
             id: input.id,
-            role: input.role
+            role: input.role,
         }, process.env.JWT_KEY, {
             expiresIn,
         });
@@ -35,7 +35,7 @@ class Authenticator {
         const payload = jwt.verify(token, process.env.JWT_KEY);
         const result = {
             id: payload.id,
-            role: payload.role
+            role: payload.role,
         };
         return result;
     }

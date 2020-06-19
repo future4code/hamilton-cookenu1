@@ -9,22 +9,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getRecipeEndingPoint = exports.createRecipeEndingPoint = void 0;
+const express_1 = require("express");
 const RecipeDataBase_1 = require("../data/RecipeDataBase");
 const Authenticator_1 = require("../services/Authenticator");
 const IdGenetor_1 = require("../services/IdGenetor");
 const CustomError_1 = require("../Util/CustomError");
-exports.createRecipeEndingPoint = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+const createRecipeEndingPoint = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const id = new IdGenetor_1.IdGenerator().generate();
     const { title, description } = request.body;
     const token = request.headers.authorization;
     const userInfo = yield new Authenticator_1.Authenticator().getData(token);
-    yield new RecipeDataBase_1.RecipeDataBase().createRecipe(id, title, description, new Date, userInfo.id);
+    yield new RecipeDataBase_1.RecipeDataBase().createRecipe(id, title, description, new Date(), userInfo.id);
     response.status(200).send({
         message: `Receita criada com sucesso!`,
     });
 });
-exports.getRecipeEndingPoint = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
+const getRecipeEndingPoint = (request, response) => __awaiter(void 0, void 0, void 0, function* () {
     const id = request.params.id;
     const token = request.headers.authorization;
     const userInfo = yield new Authenticator_1.Authenticator().getData(token);
@@ -35,3 +35,7 @@ exports.getRecipeEndingPoint = (request, response) => __awaiter(void 0, void 0, 
     }
     response.status(200).send(recipe);
 });
+const recipeRoute = express_1.Router();
+recipeRoute.post("/", createRecipeEndingPoint);
+recipeRoute.get("/:id", getRecipeEndingPoint);
+exports.default = recipeRoute;
