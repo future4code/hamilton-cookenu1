@@ -6,6 +6,7 @@ import { HashManager } from "../services/HashManager";
 import { CustomError } from "../Util/CustomError";
 import validateEmail from "../Util/emailValidate";
 import { validatePassword } from "../Util/validatePassword";
+import { ServerDataBase } from "../data/ServerDataBase";
 
 export const loginEndingPoint = async (
   request: Request,
@@ -76,4 +77,6 @@ export const loginEndingPoint = async (
     "access token": accessToken,
     "refresh token": refreshToken,
   });
+
+  await ServerDataBase.destroyConnection()
 };
