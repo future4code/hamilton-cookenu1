@@ -2,10 +2,13 @@ import express from "express";
 import "express-async-errors";
 import { AddressInfo } from "net";
 import errorCatcher from "./Middlewares/ErrorCatcher";
-import {
-  signUpEndingPoint
-} from "./Routes/signup.routes"
-import { login } from "./Routes/login.routes";
+import { signUpEndingPoint } from "./Routes/signup.routes"
+import { loginEndingPoint } from "./Routes/login.routes";
+import { getProfileEndingPoint } from "./Routes/user.routes"
+import { 
+  createRecipeEndingPoint,
+  getRecipeEndingPoint
+} from "./Routes/recipe.routes";
 
 const app = express();
 
@@ -13,7 +16,13 @@ app.use(express.json());
 
 app.post("/signup", signUpEndingPoint)
 
-app.post("/login", login)
+app.post("/login", loginEndingPoint)
+
+app.get("/user/profile", getProfileEndingPoint)
+
+app.post("/recipe", createRecipeEndingPoint)
+
+app.get("/recipe/:id", getRecipeEndingPoint)
 
 app.use(errorCatcher);
 

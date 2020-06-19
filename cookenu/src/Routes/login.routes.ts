@@ -5,13 +5,14 @@ import { validatePassword } from "../Util/validatePassword"
 import { UserDatabase } from "../data/UserDataBase"
 import { Authenticator } from "../services/Authenticator"
 import { HashManager } from "../services/HashManager"
+import { RefreshTokenDataBase } from "../data/RefreshTokenDataBase"
 
-export const login = async (
+export const loginEndingPoint = async (
     request : Request,
     response : Response
 ) => {
 
-    const { email, password } = request.body
+    const { email, password, device } = request.body
 
     const isEmail = validateEmail(email)
     if(!isEmail){
@@ -41,13 +42,36 @@ export const login = async (
         throw new CustomError("O usuário só pode ser do tipo normal ou admin!", 412)
     }
 
-    const newToken = await new Authenticator().generateToken({
+    const authenticator = new Authenticator()
+    const accessToken = await authenticator.generateToken({
         id: user.id, 
         role: user.role
-    })
+    }, "1d"
+    )
+    const refreshToken = await authenticator.generateToken({
+        id: user.id,
+        device: user.device
+    }, "1d"
+    )
+
+    const refreshTokenDataBase = new RefreshTokenDataBase()
+    await refreshTokenDataBase.storeRefreshToken(
+            refreshToken,
+            user.device,
+            true,
+            user.id
+        )
+    const retrievedRefreshToken = await refreshTokenDataBase.getRefreshTokenByIdAndDevice(
+        user.id,
+        user.device
+    )
+    if(retrievedRefreshToken){
+        await refreshTokenDataBase.deleteRefreshToken(retrievedRefreshToken.token)
+    }
 
     response.status(200).send({
         message: `Usuário logado com sucesso!`,
-        newToken
+        "access token": accessToken,
+        "refresh token": refreshToken
     })
 }

@@ -9,49 +9,31 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserDatabase = void 0;
+exports.RecipeDataBase = void 0;
 const ServerDataBase_1 = require("./ServerDataBase");
-class UserDatabase extends ServerDataBase_1.ServerDataBase {
-    createUser(id, name, password, email, role, device) {
+class RecipeDataBase extends ServerDataBase_1.ServerDataBase {
+    createRecipe(id, title, description, created_at, user_id) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.getConnection()
                 .insert({
                 id,
-                name,
-                password,
-                email,
-                role,
-                device
+                title,
+                description,
+                created_at,
+                user_id,
             })
-                .into(UserDatabase.TABLE_NAME);
+                .into(RecipeDataBase.TABLE_NAME);
         });
     }
-    getUserByEmail(email) {
+    getRecipeById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield this.getConnection()
                 .select("*")
-                .from(UserDatabase.TABLE_NAME)
-                .where({ email });
-            return result[0];
-        });
-    }
-    getUserById(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const result = yield this.getConnection()
-                .select("*")
-                .from(UserDatabase.TABLE_NAME)
+                .from(RecipeDataBase.TABLE_NAME)
                 .where({ id });
             return result[0];
         });
     }
-    deleteUser(id) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this.getConnection()
-                .where({ id: id })
-                .del()
-                .from(UserDatabase.TABLE_NAME);
-        });
-    }
 }
-exports.UserDatabase = UserDatabase;
-UserDatabase.TABLE_NAME = "users_cookenu";
+exports.RecipeDataBase = RecipeDataBase;
+RecipeDataBase.TABLE_NAME = "recipes_cookenu";

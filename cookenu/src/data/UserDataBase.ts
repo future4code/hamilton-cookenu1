@@ -5,11 +5,12 @@ export class UserDatabase extends ServerDataBase {
     private static TABLE_NAME = "users_cookenu";
 
     public async createUser(
-        id: string,
-        name: string,
-        password: string,
-        email: string,
-        role: string
+        id : string,
+        name : string,
+        password : string,
+        email : string,
+        role : string,
+        device : string
     ): Promise<void> {
         await this.getConnection()
             .insert({
@@ -17,7 +18,8 @@ export class UserDatabase extends ServerDataBase {
                 name,
                 password,
                 email,
-                role
+                role,
+                device
             })
             .into(UserDatabase.TABLE_NAME);
     }
