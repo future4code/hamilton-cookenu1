@@ -22,4 +22,12 @@ export class FollowDatabase extends ServerDataBase {
       .where({ id_follower })
       .into(FollowDatabase.TABLE_NAME);
   }
+
+  public async deleteAllUserRelations(id: string) {
+    await this.getConnection()
+      .into(FollowDatabase.TABLE_NAME)
+      .delete()
+      .where({ id_follower: id })
+      .orWhere({ id_following: id });
+  }
 }

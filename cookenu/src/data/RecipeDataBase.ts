@@ -33,20 +33,27 @@ export class RecipeDataBase extends ServerDataBase {
       .select("*")
       .from(RecipeDataBase.TABLE_NAME)
       .where({ user_id });
-    return recipe[0]
+    return recipe[0];
   }
 
-  public async editRecipe (
-    recipe_id : string,
-    recipe_title : string,
-    recipe_description : string
-    ){
+  public async editRecipe(
+    recipe_id: string,
+    recipe_title: string,
+    recipe_description: string
+  ) {
     await this.getConnection()
       .from(RecipeDataBase.TABLE_NAME)
-      .where({id: recipe_id})
+      .where({ id: recipe_id })
       .update({
         title: recipe_title,
-        description: recipe_description
-      })
+        description: recipe_description,
+      });
+  }
+
+  public async deleteAllRecipesFromUser(user_id: string) {
+    this.getConnection()
+      .into(RecipeDataBase.TABLE_NAME)
+      .delete()
+      .where({ user_id });
   }
 }
