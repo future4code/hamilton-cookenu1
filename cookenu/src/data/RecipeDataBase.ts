@@ -55,5 +55,12 @@ export class RecipeDataBase extends ServerDataBase {
       .from(RecipeDataBase.TABLE_NAME)
       .where({ id: recipe_id })
       .del();
+
+  public async deleteAllRecipesFromUser(user_id: string) {
+    this.getConnection()
+      .into(RecipeDataBase.TABLE_NAME)
+      .delete()
+      .where({ user_id });
+
   }
 }

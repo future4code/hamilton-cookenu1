@@ -6,6 +6,7 @@ import { UserDatabase } from "../data/UserDataBase";
 import { Authenticator } from "../services/Authenticator";
 import { CustomError } from "../Util/CustomError";
 import moment from "moment";
+import { RefreshTokenDataBase } from "../data/RefreshTokenDataBase";
 
 const getProfileEndingPoint = async (request: Request, response: Response) => {
   const token = request.headers.authorization as string;
@@ -99,7 +100,8 @@ const getFeeedEndpoint = async (request: Request, response: Response) => {
       recipeDatabase.getRecipesByUserId(followingUsers[i].id_following),
     ]);
 
-    userRecipes.forEach((recipe : any) =>
+    userRecipes.forEach((recipe: Object) =>
+
       recipes.push({ ...recipe, userName: user.name })
     );
   }
@@ -113,6 +115,27 @@ const getFeeedEndpoint = async (request: Request, response: Response) => {
   response.status(200).send(recipes);
 };
 
+const deleteUserEndpoint = async (request: Request, response: Response) => {
+  const token = request.headers.authorization as string;
+  const userInfo = new Authenticator().getData(token);
+  const { id } = request.params;
+
+  const userDatabase = new UserDatabase();
+
+  if (userInfo.role !== "admin")
+    throw new CustomError("Usuário is not Admin", 402);
+
+  if (!(await userDatabase.getUserById(id)))
+    throw new CustomError("User does not exist", 400);
+
+  await new RefreshTokenDataBase().deleteUserRefreshToken(id);
+  await new FollowDatabase().deleteAllUserRelations(id);
+  await new RecipeDataBase().deleteAllRecipesFromUser(id);
+  await userDatabase.deleteUser(id);
+
+  response.status(200).send({ message: "User successfully deleted" });
+};
+
 const userRoute = Router();
 
 userRoute.get("/profile", getProfileEndingPoint);
@@ -120,5 +143,6 @@ userRoute.get("/feed", getFeeedEndpoint);
 userRoute.get("/:id", getOtherUserProfileEndpoint);
 userRoute.post("/follow", followUserEndpoint);
 userRoute.post("/unfollow", unfollowUserEndpoint);
+userRoute.delete("/:id", deleteUserEndpoint);
 
 export default userRoute;
