@@ -23,6 +23,7 @@ export class Authenticator {
     const result = {
       id: payload.id,
       role: payload.role,
+      device: payload.device,
     };
     return result;
   }

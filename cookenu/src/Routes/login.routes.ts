@@ -42,19 +42,17 @@ export const loginEndingPoint = async (
   }
 
   const authenticator = new Authenticator();
-  const accessToken = authenticator.generateToken(
-    {
-      id: user.id,
-      role: user.role,
-    },
-    "1d"
-  );
-  const refreshToken = await authenticator.generateToken(
+  const accessToken = authenticator.generateToken({
+    id: user.id,
+    role: user.role,
+  });
+
+  const refreshToken = authenticator.generateToken(
     {
       id: user.id,
       device: user.device,
     },
-    "1d"
+    "1y"
   );
 
   const refreshTokenDataBase = new RefreshTokenDataBase();
@@ -78,5 +76,5 @@ export const loginEndingPoint = async (
     "refresh token": refreshToken,
   });
 
-  await ServerDataBase.destroyConnection()
+  await ServerDataBase.destroyConnection();
 };
