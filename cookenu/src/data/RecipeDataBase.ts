@@ -29,11 +29,10 @@ export class RecipeDataBase extends ServerDataBase {
   }
 
   public async getRecipesByUserId(user_id: string) {
-    const recipe = await this.getConnection()
+    return await this.getConnection()
       .select("*")
       .from(RecipeDataBase.TABLE_NAME)
       .where({ user_id });
-    return recipe[0];
   }
 
   public async editRecipe(
@@ -55,12 +54,12 @@ export class RecipeDataBase extends ServerDataBase {
       .from(RecipeDataBase.TABLE_NAME)
       .where({ id: recipe_id })
       .del();
+  }
 
   public async deleteAllRecipesFromUser(user_id: string) {
     this.getConnection()
       .into(RecipeDataBase.TABLE_NAME)
       .delete()
       .where({ user_id });
-
   }
 }

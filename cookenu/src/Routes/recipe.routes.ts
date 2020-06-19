@@ -14,7 +14,7 @@ const createRecipeEndingPoint = async (
   const { title, description } = request.body;
   const token = request.headers.authorization as string;
 
-  const userInfo = await new Authenticator().getData(token);
+  const userInfo = new Authenticator().getData(token);
 
   await new RecipeDataBase().createRecipe(
     id,
@@ -53,7 +53,7 @@ const editRecipeEndingPoint = async (request: Request, response: Response) => {
   const { recipeId, recipeTitle, recipeDescription } = request.body;
 
   const user = await new Authenticator().getData(token);
-  const recipeCheck = await new RecipeDataBase().getRecipesByUserId(user.id);
+  const recipeCheck = await new RecipeDataBase().getRecipeById(recipeId);
   if (recipeCheck.user_id !== user.id) {
     throw new CustomError(
       "Esta receita não pode ser modificada por esse usuário",
@@ -80,7 +80,7 @@ const deleteRecipeEndingPoint = async (
   const recipeId = request.body.recipeId;
 
   const user = await new Authenticator().getData(token);
-  const recipeCheck = await new RecipeDataBase().getRecipesByUserId(user.id);
+  const recipeCheck = await new RecipeDataBase().getRecipeById(recipeId);
   if (recipeCheck.user_id !== user.id) {
     throw new CustomError(
       "Esta receita não pode ser deletada por esse usuário",

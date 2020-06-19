@@ -101,7 +101,6 @@ const getFeeedEndpoint = async (request: Request, response: Response) => {
     ]);
 
     userRecipes.forEach((recipe: Object) =>
-
       recipes.push({ ...recipe, userName: user.name })
     );
   }
@@ -113,6 +112,7 @@ const getFeeedEndpoint = async (request: Request, response: Response) => {
   });
 
   response.status(200).send(recipes);
+  await ServerDataBase.destroyConnection();
 };
 
 const deleteUserEndpoint = async (request: Request, response: Response) => {
@@ -134,6 +134,8 @@ const deleteUserEndpoint = async (request: Request, response: Response) => {
   await userDatabase.deleteUser(id);
 
   response.status(200).send({ message: "User successfully deleted" });
+
+  await ServerDataBase.destroyConnection();
 };
 
 const userRoute = Router();
