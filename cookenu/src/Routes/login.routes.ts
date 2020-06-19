@@ -41,7 +41,7 @@ export const loginEndingPoint = async (
   }
 
   const authenticator = new Authenticator();
-  const accessToken = await authenticator.generateToken(
+  const accessToken = authenticator.generateToken(
     {
       id: user.id,
       role: user.role,

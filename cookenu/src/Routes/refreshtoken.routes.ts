@@ -13,7 +13,7 @@ export const renewRefreshToken = async (
     const { refreshToken, device } = request.body
 
     const authenticator = new Authenticator()
-    const userData = await authenticator.getData(refreshToken)
+    const userData = authenticator.getData(refreshToken)
 
     if( userData.device !== device ){
         throw new CustomError("Logue novamente!", 412)
@@ -21,7 +21,7 @@ export const renewRefreshToken = async (
 
     const user = await new UserDatabase().getUserById(userData.id)
 
-    const newAccessToken = await authenticator.generateToken(
+    const newAccessToken = authenticator.generateToken(
         {
             id: user.id,
             role: user.role
