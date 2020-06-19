@@ -29,10 +29,14 @@ export const signUpEndingPoint = async (
     }
 
     if(role !== "normal" && role !== "admin"){
-        throw new CustomError("O usuário só pode ser do tipo normal ou admin!", 412)
+        throw new CustomError(
+            "O usuário só pode ser do tipo normal ou admin!", 
+            412
+            )
     }
 
-    const newHash = await new HashManager().createHash(password)
+    const newHash = await new HashManager()
+    .createHash(password)
 
     await new UserDatabase().createUser(
         newId,
@@ -43,14 +47,16 @@ export const signUpEndingPoint = async (
         device
     )
 
-    const newAccessToken = await new Authenticator().generateToken({
+    const newAccessToken = await new Authenticator()
+    .generateToken({
         id: newId,
         role: role
     },
     "1d"
     )
 
-    const newRefreshToken = await new Authenticator().generateToken({
+    const newRefreshToken = await new Authenticator()
+    .generateToken({
         id: newId,
         device: device,
     },

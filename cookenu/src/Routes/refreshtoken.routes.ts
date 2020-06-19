@@ -5,7 +5,7 @@ import { UserDatabase } from "../data/UserDataBase"
 import { ServerDataBase } from "../data/ServerDataBase"
 
 
-const renewRefreshToken = async (
+export const renewRefreshToken = async (
     request : Request,
     response : Response
 ) => {
