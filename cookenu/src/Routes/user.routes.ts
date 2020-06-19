@@ -99,7 +99,7 @@ const getFeeedEndpoint = async (request: Request, response: Response) => {
       recipeDatabase.getRecipesByUserId(followingUsers[i].id_following),
     ]);
 
-    userRecipes.forEach((recipe) =>
+    userRecipes.forEach((recipe : any) =>
       recipes.push({ ...recipe, userName: user.name })
     );
   }
